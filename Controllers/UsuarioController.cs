@@ -59,5 +59,21 @@ namespace CoderHouse_SistemaGestion.Controllers
             }
         }
 
+        [HttpDelete]
+        [Route("EliminarUsuario")]
+        public IActionResult EliminarUsuario([FromBody] int IdUsuario)
+        {
+            try
+            {
+                UsuarioRepository.EliminarUsuario(IdUsuario);
+                return Ok(new { message = "Usuario eliminado con exito!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
     }
 }

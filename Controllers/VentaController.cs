@@ -34,7 +34,20 @@ namespace CoderHouse_SistemaGestion.Controllers
 
         }
 
-
+        [HttpDelete]
+        [Route("EliminarVenta")]
+        public IActionResult EliminarProducto([FromBody] int IdVenta)
+        {
+            try
+            {
+                VentaRepository.EliminarVenta(IdVenta);
+                return Ok(new { message = "Venta eliminada con exito!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

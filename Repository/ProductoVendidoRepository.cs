@@ -86,6 +86,26 @@ namespace CoderHouse_SistemaGestion.Repository
             }
         }
 
+        public static void EliminarProductoVendidoPorVenta(int idVenta)
+        {
+            using (SqlConnection connection = new SqlConnection(General.connectionString()))
+            {
+                connection.Open();
+                SqlCommand cmd = connection.CreateCommand();
+                cmd.CommandText = @"DELETE ProductoVendido WHERE idVenta = @idVenta; ";
+
+                var paramidVenta = new SqlParameter();
+                paramidVenta.ParameterName = "idVenta";
+                paramidVenta.SqlDbType = SqlDbType.BigInt;
+                paramidVenta.Value = idVenta;
+
+                cmd.Parameters.Add(paramidVenta);
+
+                cmd.ExecuteNonQuery();
+                connection.Close();
+
+            }
+        }
 
         public static void CargarProductoVendido(List<Producto> pProductos, int pidVenta)
         {
@@ -140,5 +160,44 @@ namespace CoderHouse_SistemaGestion.Repository
 
 
         }
+
+        public static void ActualizarStockDeProductos(int pIdVenta)
+        {
+
+            using (SqlConnection connection = new SqlConnection(General.connectionString()))
+            {
+                connection.Open();
+                SqlCommand cmd = connection.CreateCommand();
+                cmd.CommandText = @"SELECT id,Stock,idProducto,IdVenta FROM ProductoVendido WHERE idVenta = @pIdVenta; ";
+
+                var paramidVenta = new SqlParameter();
+                paramidVenta.ParameterName = "pIdVenta";
+                paramidVenta.SqlDbType = SqlDbType.BigInt;
+                paramidVenta.Value = pIdVenta;
+
+                cmd.Parameters.Add(paramidVenta);
+
+                var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    ProductoRepository.SumarStock(Convert.ToInt32(reader.GetValue(1)), Convert.ToInt32(reader.GetValue(2)));
+
+                }
+
+                connection.Close();
+
+            }
+
+        }
+
+
+
+
+
     }
+
+
+
+
+
 }

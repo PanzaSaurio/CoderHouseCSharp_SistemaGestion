@@ -202,5 +202,33 @@ namespace CoderHouse_SistemaGestion.Repository
 
         }
 
+        public static void EliminarUsuario(int IdUsuario)
+        {
+            using (SqlConnection connection = new SqlConnection(General.connectionString()))
+            {
+
+                VentaRepository.EliminarVentaPorUsuario(IdUsuario);
+                ProductoRepository.EliminarProductoPorUsuario(IdUsuario);
+
+
+                connection.Open();
+
+                SqlCommand cmd = connection.CreateCommand();
+                cmd.CommandText = @"DELETE Usuario WHERE id = @IdUsuario; ";
+
+                var paramIdUsuario = new SqlParameter();
+                paramIdUsuario.ParameterName = "IdUsuario";
+                paramIdUsuario.SqlDbType = SqlDbType.BigInt;
+                paramIdUsuario.Value = IdUsuario;
+
+                cmd.Parameters.Add(paramIdUsuario);
+
+
+                cmd.ExecuteNonQuery();
+                connection.Close();
+
+            }
+        }
+
     }
 }

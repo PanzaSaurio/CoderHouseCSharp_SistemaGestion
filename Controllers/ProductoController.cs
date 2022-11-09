@@ -33,7 +33,6 @@ namespace CoderHouse_SistemaGestion.Controllers
 
         }
 
-
         [HttpPut]
         [Route("ModificarProducto")]
         public IActionResult ModificarProducto([FromBody] Producto producto)

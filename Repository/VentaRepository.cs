@@ -49,11 +49,11 @@ namespace CoderHouse_SistemaGestion.Repository
             return listaVentas;
         }
 
-        public static void CargarVenta(List<Producto> productos,int pIdUsuario)
+        public static void CargarVenta(List<Producto> productos, int pIdUsuario)
         {
             using (SqlConnection connection = new SqlConnection(General.connectionString()))
             {
-                
+
                 int idVenta;
                 connection.Open();
                 SqlCommand cmd = connection.CreateCommand();
@@ -77,12 +77,76 @@ namespace CoderHouse_SistemaGestion.Repository
 
                 idVenta = Convert.ToInt32(cmd.ExecuteScalar());
                 connection.Close();
-                
+
                 ProductoVendidoRepository.CargarProductoVendido(productos, idVenta);
-                
+
 
             }
         }
 
+        public static void EliminarVenta(int idVenta)
+        {
+            using (SqlConnection connection = new SqlConnection(General.connectionString()))
+            {
+                ProductoVendidoRepository.ActualizarStockDeProductos(idVenta);
+                ProductoVendidoRepository.EliminarProductoVendidoPorVenta(idVenta);
+
+                connection.Open();
+
+                SqlCommand cmd = connection.CreateCommand();
+                cmd.CommandText = @"DELETE venta WHERE id = @idVenta; ";
+
+                var paramidVenta = new SqlParameter();
+                paramidVenta.ParameterName = "idVenta";
+                paramidVenta.SqlDbType = SqlDbType.BigInt;
+                paramidVenta.Value = idVenta;
+
+                cmd.Parameters.Add(paramidVenta);
+
+
+                cmd.ExecuteNonQuery();
+                connection.Close();
+
+            }
+        }
+
+        public static void EliminarVentaPorUsuario(int idUsuario)
+        {
+            using (SqlConnection connection = new SqlConnection(General.connectionString()))
+            {
+                var listaVentas = new List<Venta>();
+                listaVentas = VentaRepository.TraerVentas(idUsuario);
+
+                foreach (var item in listaVentas)
+                {
+                    ProductoVendidoRepository.EliminarProductoVendidoPorVenta(item.Id);
+                }
+
+
+                connection.Open();
+
+                foreach (var item in listaVentas)
+                {
+                    SqlCommand cmd = connection.CreateCommand();
+                    cmd.CommandText = @"DELETE venta WHERE id = @idVenta; ";
+
+                    var paramidVenta = new SqlParameter();
+                    paramidVenta.ParameterName = "idVenta";
+                    paramidVenta.SqlDbType = SqlDbType.BigInt;
+                    paramidVenta.Value = item.Id;
+
+                    cmd.Parameters.Add(paramidVenta);
+                    cmd.ExecuteNonQuery();
+                }
+
+
+                connection.Close();
+
+
+
+
+            }
+        }
+    
     }
 }

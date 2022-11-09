@@ -93,7 +93,6 @@ namespace CoderHouse_SistemaGestion.Repository
             return producto;
         }
 
-
         public static void AgregarProducto(Producto producto)
         {
             using (SqlConnection connection = new SqlConnection(General.connectionString()))
@@ -233,6 +232,29 @@ namespace CoderHouse_SistemaGestion.Repository
             }
         }
 
+        public static void EliminarProductoPorUsuario(int idUsuario)
+        {
+            using (SqlConnection connection = new SqlConnection(General.connectionString()))
+            {
+
+                connection.Open();
+
+                SqlCommand cmd = connection.CreateCommand();
+                cmd.CommandText = @"DELETE Producto WHERE IdUsuario = @idUsuario; ";
+
+                var paramidUsuario = new SqlParameter();
+                paramidUsuario.ParameterName = "idUsuario";
+                paramidUsuario.SqlDbType = SqlDbType.BigInt;
+                paramidUsuario.Value = idUsuario;
+
+                cmd.Parameters.Add(paramidUsuario);
+
+
+                cmd.ExecuteNonQuery();
+                connection.Close();
+
+            }
+        }
 
         public static void RestarStock(int pIdProducto,int pStock)
         {
@@ -245,11 +267,45 @@ namespace CoderHouse_SistemaGestion.Repository
                 connection.Open();
                 SqlCommand cmd = connection.CreateCommand();
                 cmd.CommandText = @"UPDATE Producto 
-                                       SET Stock = @Stock
+                                       SET Stock = (Stock - @Stock)
                                      WHERE id = @id; ";
 
                 var paramId = new SqlParameter();
                 paramId.ParameterName = "id";
+                paramId.SqlDbType = SqlDbType.BigInt;
+                paramId.Value = pIdProducto;
+
+                var paramStock = new SqlParameter();
+                paramStock.ParameterName = "Stock";
+                paramStock.SqlDbType = SqlDbType.Int;
+                paramStock.Value = producto.Stock - pStock;
+
+
+                cmd.Parameters.Add(paramId);
+                cmd.Parameters.Add(paramStock);
+
+                cmd.ExecuteNonQuery();
+                connection.Close();
+
+            }
+        }
+
+        public static void SumarStock(int pIdProducto, int pStock)
+        {
+            using (SqlConnection connection = new SqlConnection(General.connectionString()))
+            {
+                Producto producto = new Producto();
+
+                producto = TraerProducto(pIdProducto);
+
+                connection.Open();
+                SqlCommand cmd = connection.CreateCommand();
+                cmd.CommandText = @"UPDATE Producto 
+                                       SET Stock = (Stock + @Stock)
+                                     WHERE id = @pIdProducto; ";
+
+                var paramId = new SqlParameter();
+                paramId.ParameterName = "pIdProducto";
                 paramId.SqlDbType = SqlDbType.BigInt;
                 paramId.Value = pIdProducto;
 
